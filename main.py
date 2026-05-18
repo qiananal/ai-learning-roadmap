@@ -1,0 +1,1 @@
+print("Hello MLOps! 你的第一个 Docker 镜像运行成功啦！")
