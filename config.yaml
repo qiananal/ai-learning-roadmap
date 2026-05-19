@@ -1,0 +1,11 @@
+# AI 服务基础配置
+server:
+  host: "127.0.0.1"
+  port: 8000
+
+# 算法模型核心参数
+model:
+  name: "YOLOv8-Strawberry-GAMUT"
+  weight_path: "weights/best.pth"
+  default_threshold: 0.25
+  supported_cameras: [1, 2, 3]
