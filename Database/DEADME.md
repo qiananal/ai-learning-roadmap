@@ -291,6 +291,46 @@ python main.py
 这一瞬间，你会看到你刚刚上传的那颗草莓、它的预测克数、绝对误差、以及大模型现场手写的质检指南，全部整整齐齐地以标准数据库报表的形式，被你用 SELECT 语法完美地从硬盘里召唤了出来！
 
 
+# SQL 数据库专属超细复盘
+
+## 1. 核心招式语法与项目实例对照表
+
+
+## 2. Python 操作数据库的“标准四部曲”底层原理
+我们在 main.py 和 app_dashboard.py 里，每次碰数据库，都雷打不动地执行了以下代码流程。面试官非常看重你是否懂这四步的底层 I/O 逻辑
+
+```python
+# 1. 建立连接 (Connection)
+conn = sqlite3.connect("gamut_production.db") 
+# 原理：在 Python 进程与硬盘的 .db 二进制文件之间，拉起一条专属的数据传输高架桥。
+
+# 2. 铸造游标 (Cursor)
+cursor = conn.cursor()
+# 原理：游标就是你在数据库里指点江山的那根“黄金手指头”。SQL 语句是一串文本，Python 无法直接执行，必须把这串文本套在游标手指头上，送进高架桥。
+
+# 3. 执行军令 (Execute)
+cursor.execute("SELECT * FROM ... WHERE id = ?;", (strawberry_id,))
+# 原理：让手指头在数据库里划定范围、翻箱倒柜。
+# 企业级防线：严禁使用字符串拼接（f"id='{id}'"），必须用 ? 占位符元组传参！大厂叫防止“SQL注入攻击（SQL Injection）”。
+
+# 4. 签字画押并关闭 (Commit & Close)
+conn.commit()
+conn.close()
+# 原理：执行完写操作（INSERT/UPDATE）后，数据其实还悬浮在内存缓冲区。只有执行 commit()，操作系统才会把数据狠狠砸进硬盘。最后执行 close() 拆掉高架桥，释放内存。
+```
+
+## 3. SQL 实际会遇到的企业级生产问题
+
+### 问题：数据库锁死异常（database is locked）
+
+真实场景：流水线高频开工，FastAPI 一秒钟写 50 次，这时候你刚好在大屏上点了一下“确认一键校准真值”触发了 UPDATE。
+
+工程原因：SQLite 是轻量级数据库，为了保证数据不写烂，它写数据时会拉起“文件级排他锁（Exclusive Lock）”。当大屏占用锁时，FastAPI 进不去，超时后就会直接抛出报错拒绝服务。
+
+大厂避坑：在本地初始化连接时，必须加上自旋等待参数：sqlite3.connect(DB_PATH, timeout=20.0)。这代表让抢不到锁的进程在门口乖乖站队等候 20 秒，而不是当场崩溃。如果业务量进一步飙升，则必须将数据库平滑迁移到支持“行级锁（Row-level Lock）”的工业级 MySQL 或 PostgreSQL 上。
+
+
+
 # 高频面试拷问（Interview QA）
 ### Q1：在流水线高并发环境下，为什么用 INSERT OR REPLACE（UPSERT）而不是普通的 INSERT？
 
