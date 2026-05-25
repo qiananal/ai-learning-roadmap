@@ -121,7 +121,7 @@ Docker 的运行也是由三部分组成的：
     docker build：Docker 给我编译一个集装箱镜像。
     -t my-ai-app：给这个镜像起个名字叫 my-ai-app。
     -f docker/Dockerfile：-f 代表 file（文件）。强行指定路标，告诉 Docker：“菜谱在 docker 文件夹里面，你去那里读。”
-    .（最核心的盲点：最后这个小圆点！）：代表当前目录（根目录）。告诉 Docker：“以最外层根目录作为你的总基地，把这里的 main.py 和所有代码全部打包带走！”
+    .（最核心的盲点：最后这个小圆点！）：构建上下文。代表当前目录（根目录）。告诉 Docker：“以最外层根目录作为你的总基地，把这里的 main.py 和所有代码全部打包带走！”
 
 这时候你会看到终端开始疯狂滚动蓝色或黑色的日志，它正在顺着你的 Dockerfile 菜谱一层一层地把 Python 环境、requirements.txt 里的依赖包（FastAPI、NumPy 等）下载并打包。
 
