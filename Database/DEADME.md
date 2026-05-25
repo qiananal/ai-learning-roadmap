@@ -289,3 +289,17 @@ python main.py
 点击它，展开 Try it out，在 min_error 里输入 0.0，然后点击 Execute。
 
 这一瞬间，你会看到你刚刚上传的那颗草莓、它的预测克数、绝对误差、以及大模型现场手写的质检指南，全部整整齐齐地以标准数据库报表的形式，被你用 SELECT 语法完美地从硬盘里召唤了出来！
+
+
+# 高频面试拷问（Interview QA）
+### Q1：在流水线高并发环境下，为什么用 INSERT OR REPLACE（UPSERT）而不是普通的 INSERT？
+
+大厂业务痛点：若发生相机误扫、物理重传，同一颗草莓编号（主键 PRIMARY KEY）会触发唯一性冲突报错（IntegrityError）。若用普通 INSERT，后端网关会直接抛出 500 崩溃，导致流水线软件卡死、自动化停工。
+
+高可用解法：INSERT OR REPLACE 保证了接口的幂等性（Idempotency）。主键冲突时，它会自动原子化地“擦除旧记录 + 覆盖写入新数据”，系统全天候不宕机。
+
+### Q2：当 FastAPI 网关正在高频写入，大屏同时在执行 UPDATE 修改，高并发数据撞车了怎么弄？
+
+SQLite 边缘端策略：SQLite 采用粗暴的文件级写锁（File Lock），写操作时锁死整个文件。
+
+大厂后端需配置 busy_timeout 机制，让未抢到锁的进程自旋重试，防范 database is locked 异常。互联网大厂演进方案：线上系统会平滑迁移至 MySQL 或 PostgreSQL，利用行级锁（Row Lock）实现“你改你的 001，我插我的 002”，互不干扰。若同时改同一行，则引入基于 Version 版本号的乐观锁（Optimistic Locking），利用 CAS（Compare-And-Swap）机制实现无锁高并发控制。

@@ -33,3 +33,5 @@ conn.close()
 print("📥 经过高级 SQL 筛选后，符合次品或特级特征的草莓有：")
 for row in all_rows:
     print(f"🎯 命中目标 -> 编号: {row[0]}, 重量: {row[1]}g, 形状: {row[2]}")
+
+
