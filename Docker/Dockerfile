@@ -18,3 +18,4 @@ EXPOSE 8000
 
 # 7. 启动命令：当集装箱被拉起运行（Container）时，默认执行的主入口脚本
 CMD ["python", "main.py"]
+
