@@ -1,1 +1,8 @@
-*.pth
+# 博客系统缓存与打包产物
+.vitepress/dist
+.vitepress/cache
+
+# 之前遗留的本地运行文件（建议忽略并删除）
+app.log
+*.db
+lw488655446*
