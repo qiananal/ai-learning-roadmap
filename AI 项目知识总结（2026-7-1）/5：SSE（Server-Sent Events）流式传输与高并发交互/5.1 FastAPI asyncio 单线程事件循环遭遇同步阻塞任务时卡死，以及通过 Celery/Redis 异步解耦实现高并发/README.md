@@ -1,5 +1,6 @@
 ## FastAPI asyncio 单线程事件循环遭遇同步阻塞任务时卡死，以及通过 Celery/Redis 异步解耦实现高并发
 
+这一部分解决的是 “CPU/GPU 密集型重度任务”（比如跑 PyTorch 推理、Open3D 矩阵运算）。
 ### 1. 一个极其生动的比喻：单人收银员与后厨
 
 我们要搞懂 FastAPI 的 asyncio，先在脑子里建立一个“快餐店”的画面：
